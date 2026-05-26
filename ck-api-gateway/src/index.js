@@ -285,7 +285,7 @@ import { handleGrowthDashboard, handleGrowthCertifications, handleGrowthRecruitm
 import { handleListSocialAgents, handleGetSocialAgent, handleSocialDashboard, handleSocialGenerate, handleSocialCampaign, handleSocialCalendar } from './routes/social-campaign.js';
 import { handleGenerateReport, handleGenerateSummary, handleSentinelWorkforceStatus } from './routes/sentinel-report.js';
 import { handleAgencyDashboard, handleListUnits, handleGetUnit, handleUnitReview, handleBoardMemo, handleUnitSOP, handleOnboardUnit } from './routes/ai-workforce.js';
-import { handleProductCatalog, handleProductDetail, handleProductCheckout, handlePurchaseLookup } from './routes/digital-products.js';
+import { handleProductCatalog, handlePaidProducts, handleLeadMagnets, handleProductDetail, handleProductCheckout, handlePurchaseLookup } from './routes/digital-products.js';
 import { jsonResponse, errorResponse, corsHeaders } from './utils/response.js';
 
 export default {
@@ -992,9 +992,15 @@ export default {
         return handleGetUnit(unitId);
       }
 
-      // ── Digital Products Suite ──
+      // ── Digital Products Suite (13 products: 7 paid + 6 lead magnets) ──
       if (path === '/v1/products/catalog' && method === 'GET') {
         return handleProductCatalog();
+      }
+      if (path === '/v1/products/paid' && method === 'GET') {
+        return handlePaidProducts();
+      }
+      if (path === '/v1/products/lead-magnets' && method === 'GET') {
+        return handleLeadMagnets();
       }
       if (path.match(/^\/v1\/products\/purchases\/[^/]+$/) && method === 'GET') {
         const email = decodeURIComponent(path.split('/v1/products/purchases/')[1]);
