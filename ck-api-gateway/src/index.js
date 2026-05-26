@@ -285,6 +285,7 @@ import { handleGrowthDashboard, handleGrowthCertifications, handleGrowthRecruitm
 import { handleListSocialAgents, handleGetSocialAgent, handleSocialDashboard, handleSocialGenerate, handleSocialCampaign, handleSocialCalendar } from './routes/social-campaign.js';
 import { handleGenerateReport, handleGenerateSummary, handleSentinelWorkforceStatus } from './routes/sentinel-report.js';
 import { handleAgencyDashboard, handleListUnits, handleGetUnit, handleUnitReview, handleBoardMemo, handleUnitSOP, handleOnboardUnit } from './routes/ai-workforce.js';
+import { handleProductCatalog, handleProductDetail, handleProductCheckout, handlePurchaseLookup } from './routes/digital-products.js';
 import { jsonResponse, errorResponse, corsHeaders } from './utils/response.js';
 
 export default {
@@ -989,6 +990,23 @@ export default {
       if (path.match(/^\/v1\/ai-agency\/units\/[^/]+$/) && method === 'GET') {
         const unitId = path.split('/v1/ai-agency/units/')[1];
         return handleGetUnit(unitId);
+      }
+
+      // ── Digital Products Suite ──
+      if (path === '/v1/products/catalog' && method === 'GET') {
+        return handleProductCatalog();
+      }
+      if (path.match(/^\/v1\/products\/purchases\/[^/]+$/) && method === 'GET') {
+        const email = decodeURIComponent(path.split('/v1/products/purchases/')[1]);
+        return handlePurchaseLookup(email);
+      }
+      if (path.match(/^\/v1\/products\/[^/]+\/checkout$/) && method === 'POST') {
+        const productId = path.split('/v1/products/')[1].replace('/checkout', '');
+        return await handleProductCheckout(request, productId, env, ctx);
+      }
+      if (path.match(/^\/v1\/products\/[^/]+$/) && method === 'GET') {
+        const productId = path.split('/v1/products/')[1];
+        return handleProductDetail(productId);
       }
 
       // ── Cooperations Committee ──
