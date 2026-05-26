@@ -8,7 +8,7 @@ const assert = require('node:assert/strict');
 
 // ── Regex patterns extracted from routes/appointments.js ─────────────────
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const DATE_RE = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/;
 const TIME_RE = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/;
 const VALID_SERVICES = ['consultation', 'followup', 'premium'];
 
@@ -164,10 +164,7 @@ describe('Domain Validation — Name Constraints', () => {
 });
 
 describe('Domain Validation — JSON Body Size', () => {
-  // The Express server enforces a 50KB JSON body limit.
-  // These tests verify the constant is reasonable.
-
-  const BODY_LIMIT_BYTES = 50 * 1024; // 50KB
+  const BODY_LIMIT_BYTES = 50 * 1024;
 
   it('50KB limit allows typical appointment payloads', () => {
     const payload = JSON.stringify({
