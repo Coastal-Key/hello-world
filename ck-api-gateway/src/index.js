@@ -286,6 +286,7 @@ import { handleListSocialAgents, handleGetSocialAgent, handleSocialDashboard, ha
 import { handleGenerateReport, handleGenerateSummary, handleSentinelWorkforceStatus } from './routes/sentinel-report.js';
 import { handleAgencyDashboard, handleListUnits, handleGetUnit, handleUnitReview, handleBoardMemo, handleUnitSOP, handleOnboardUnit } from './routes/ai-workforce.js';
 import { handleProductCatalog, handlePaidProducts, handleLeadMagnets, handleProductDetail, handleProductCheckout, handlePurchaseLookup } from './routes/digital-products.js';
+import { handleStripeWebhook } from './routes/stripe-webhook.js';
 import { jsonResponse, errorResponse, corsHeaders } from './utils/response.js';
 
 export default {
@@ -391,6 +392,9 @@ export default {
     }
     if (path === '/v1/payments/pricing' && method === 'GET') {
       return handlePublicPricing();
+    }
+    if (path === '/v1/payments/webhook' && method === 'POST') {
+      return await handleStripeWebhook(request, env, ctx);
     }
 
     // ── Slack routes (use signature verification, not Bearer token) ──
