@@ -1,25 +1,7 @@
 {
-  "lastVerifiedAt": "2026-05-02T13:41:10Z",
-  "commit": "5ea49a47ec9ef6b5c2666f35e036044f3b097868",
-  "ref": "refs/heads/main",
-  "runId": "25253136646",
-  "runUrl": "https://github.com/Coastal-Key/hello-world/actions/runs/25253136646",
-  "registration": {"masterPromptStatus":"PRODUCTION_LIVE","avatarsCount":4,"marketingAssetsCount":10,"gapsCount":3,"collectionsAgent":{"id":"COLL-001","status":"PRODUCTION_LIVE","complianceControls":7,"endpoints":5,"reportsTo":"MCCO-000 Master Orchestrator"}},
-  "liveness": {
-    "gateway": {
-      "url": "https://ck-api-gateway.david-e59.workers.dev",
-      "alive": true,
-      "healthHttpStatus": "200",
-      "dashboardHttpStatus": "302",
-      "authEnforced": false
-    },
-    "nemotron": {
-      "url": "https://ck-nemotron-worker.david-e59.workers.dev",
-      "healthHttpStatus": "200"
-    },
-    "sentinel": {
-      "url": "https://sentinel-webhook.david-e59.workers.dev",
-      "healthHttpStatus": "405"
-    }
-  }
+  "lastDeploy": "2026-05-27T12:00:00Z",
+  "triggeredBy": "AI CEO — new Cloudflare API token",
+  "token": "cfat_QBQV...rotated",
+  "status": "deploying",
+  "services": ["ck-api-gateway", "sentinel-webhook", "ck-nemotron-worker", "ck-website", "ck-command-center"]
 }
