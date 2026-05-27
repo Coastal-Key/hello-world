@@ -400,7 +400,8 @@ export async function handleProductCheckout(request, productId, env, ctx) {
     productName = `${product.name} — Monthly`;
   }
 
-  if (!env.STRIPE_SECRET || !env.STRIPE_SECRET.startsWith('sk_')) {
+  const stripeKey = env.STRIPE_SECRET_KEY || env.STRIPE_SECRET;
+  if (!stripeKey || !stripeKey.startsWith('sk_')) {
     writeAudit(env, ctx, {
       route: `/v1/products/${productId}/checkout`,
       action: 'checkout_attempted',
@@ -433,6 +434,9 @@ export async function handleProductCheckout(request, productId, env, ctx) {
       'line_items[0][quantity]': '1',
       'success_url': 'https://coastalkey-pm.com/products/success?session_id={CHECKOUT_SESSION_ID}',
       'cancel_url': 'https://coastalkey-pm.com/products/cancel',
+      'metadata[productId]': productId,
+      'metadata[productName]': productName,
+      'metadata[source]': 'coastal-key-digital-products',
     };
 
     if (mode === 'subscription') {
@@ -442,7 +446,7 @@ export async function handleProductCheckout(request, productId, env, ctx) {
     const stripeRes = await fetch('https://api.stripe.com/v1/checkout/sessions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${env.STRIPE_SECRET}`,
+        'Authorization': `Bearer ${stripeKey}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams(params),
