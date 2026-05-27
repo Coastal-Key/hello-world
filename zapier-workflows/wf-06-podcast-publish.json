@@ -1,0 +1,86 @@
+{
+  "workflow_id": "WF-6",
+  "name": "Podcast Publish",
+  "tier": "core",
+  "module": "C",
+  "description": "When Podcast Production Status changes to Approved, generates show notes posts for each platform, queues in Buffer, and sends Slack notification to #content-production.",
+  "trigger": {
+    "app": "Airtable",
+    "event": "Record Updated",
+    "config": {
+      "base": "Master Orchestrator",
+      "table": "Podcast Production",
+      "formula": "{Status} = 'Approved'"
+    }
+  },
+  "actions": [
+    {
+      "step": 1,
+      "app": "Buffer",
+      "action": "Create Post",
+      "config": {
+        "profile": "LinkedIn",
+        "text": "{{trigger.show_notes}}",
+        "description": "Long-form show notes to LinkedIn"
+      }
+    },
+    {
+      "step": 2,
+      "app": "Buffer",
+      "action": "Create Post",
+      "config": {
+        "profile": "Facebook",
+        "text": "{{trigger.show_notes}}",
+        "description": "Long-form show notes to Facebook"
+      }
+    },
+    {
+      "step": 3,
+      "app": "Webhooks by Zapier",
+      "action": "POST",
+      "config": {
+        "url": "{{CLOUDFLARE_WORKER_URL}}",
+        "description": "Generate short-form Instagram teaser caption from show notes",
+        "payload": {
+          "prompt": "Generate a short-form Instagram clip teaser caption for podcast episode: {{trigger.episode_title}}. Show notes: {{trigger.show_notes}}. Under 150 words. Include hook and CTA to listen. Close with risk frame.",
+          "module_override": "MODULE_B"
+        }
+      }
+    },
+    {
+      "step": 4,
+      "app": "Buffer",
+      "action": "Create Post",
+      "config": {
+        "profile": "Instagram",
+        "text": "{{step3.output}}",
+        "description": "Short-form teaser caption to Instagram"
+      }
+    },
+    {
+      "step": 5,
+      "app": "Airtable",
+      "action": "Update Record",
+      "config": {
+        "base": "Master Orchestrator",
+        "table": "Podcast Production",
+        "record_id": "{{trigger.record_id}}",
+        "fields": {
+          "Status": "Published",
+          "Published At": "{{now}}"
+        }
+      }
+    },
+    {
+      "step": 6,
+      "app": "Slack",
+      "action": "Send Channel Message",
+      "config": {
+        "channel": "#content-production",
+        "message": "PODCAST PUBLISHED | {{trigger.episode_title}} | Show notes pushed to LinkedIn, Facebook, Instagram | Airtable updated"
+      }
+    }
+  ],
+  "status": "draft",
+  "activate_on_authorization": true
+}

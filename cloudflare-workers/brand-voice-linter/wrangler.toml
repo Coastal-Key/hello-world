@@ -1,0 +1,11 @@
+name = "coastalkey-brand-linter"
+main = "../brand-voice-linter.js"
+compatibility_date = "2026-03-11"
+
+[vars]
+ENVIRONMENT = "production"
+
+# Secrets (set via `wrangler secret put`):
+# AIRTABLE_API_KEY
+# AIRTABLE_BASE_ID
+# SLACK_WEBHOOK_URL

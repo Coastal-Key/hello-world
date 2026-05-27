@@ -1,0 +1,68 @@
+{
+  "workflow_id": "WF-5",
+  "name": "Video Brief to Production",
+  "tier": "core",
+  "module": "C",
+  "description": "When Video Production Status changes to Approved, assembles production brief (script, B-roll notes, thumbnail brief, caption variants) and dispatches thumbnail brief to Banana Pro AI.",
+  "trigger": {
+    "app": "Airtable",
+    "event": "Record Updated",
+    "config": {
+      "base": "Master Orchestrator",
+      "table": "Video Production",
+      "formula": "{Status} = 'Approved'"
+    }
+  },
+  "actions": [
+    {
+      "step": 1,
+      "app": "Code by Zapier",
+      "action": "Run JavaScript",
+      "config": {
+        "description": "Assemble production brief from approved record",
+        "code": "output = { title: inputData.title, content_type: inputData.content_type, script: inputData.script, broll_notes: inputData.broll_notes, thumbnail_brief: inputData.thumbnail_brief, caption_variants: inputData.caption_variants, target_segment: inputData.target_segment, platforms: inputData.platforms, assembled_at: new Date().toISOString() };"
+      }
+    },
+    {
+      "step": 2,
+      "app": "Airtable",
+      "action": "Update Record",
+      "config": {
+        "base": "Master Orchestrator",
+        "table": "Video Production",
+        "record_id": "{{trigger.record_id}}",
+        "fields": {
+          "Status": "In Production",
+          "Production Brief Assembled": "{{step1.assembled_at}}"
+        }
+      }
+    },
+    {
+      "step": 3,
+      "app": "Webhooks by Zapier",
+      "action": "POST",
+      "config": {
+        "url": "{{BANANA_PRO_AI_WEBHOOK}}",
+        "description": "Dispatch thumbnail brief to Banana Pro AI for visual asset generation",
+        "payload": {
+          "brief": "{{step1.thumbnail_brief}}",
+          "title": "{{step1.title}}",
+          "type": "thumbnail",
+          "callback_table": "Video Production",
+          "callback_record": "{{trigger.record_id}}"
+        }
+      }
+    },
+    {
+      "step": 4,
+      "app": "Slack",
+      "action": "Send Channel Message",
+      "config": {
+        "channel": "#content-production",
+        "message": "VIDEO IN PRODUCTION | {{step1.title}} | {{step1.content_type}} | Platforms: {{step1.platforms}} | Thumbnail brief dispatched to Banana Pro AI"
+      }
+    }
+  ],
+  "status": "draft",
+  "activate_on_authorization": true
+}

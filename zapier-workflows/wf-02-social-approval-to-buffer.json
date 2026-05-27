@@ -1,0 +1,55 @@
+{
+  "workflow_id": "WF-2",
+  "name": "Social Approval to Buffer",
+  "tier": "core",
+  "module": "B",
+  "description": "When Content Calendar Status changes to Approved, pushes post to Buffer as a scheduled item and sends Slack confirmation to #content-calendar.",
+  "trigger": {
+    "app": "Airtable",
+    "event": "Record Updated",
+    "config": {
+      "base": "Master Orchestrator",
+      "table": "Content Calendar",
+      "formula": "{Status} = 'Approved'"
+    }
+  },
+  "actions": [
+    {
+      "step": 1,
+      "app": "Buffer",
+      "action": "Create Post",
+      "config": {
+        "profile": "{{trigger.platform}}",
+        "text": "{{trigger.caption}}",
+        "media": "{{trigger.asset}}",
+        "scheduled_at": "{{trigger.post_date}}T10:00:00",
+        "description": "Push approved content to Buffer queue"
+      }
+    },
+    {
+      "step": 2,
+      "app": "Airtable",
+      "action": "Update Record",
+      "config": {
+        "base": "Master Orchestrator",
+        "table": "Content Calendar",
+        "record_id": "{{trigger.record_id}}",
+        "fields": {
+          "Status": "Scheduled",
+          "Buffer Post ID": "{{step1.post_id}}"
+        }
+      }
+    },
+    {
+      "step": 3,
+      "app": "Slack",
+      "action": "Send Channel Message",
+      "config": {
+        "channel": "#content-calendar",
+        "message": "CONTENT SCHEDULED | {{trigger.platform}} | {{trigger.post_date}} | Pillar: {{trigger.content_pillar}} | Buffer ID: {{step1.post_id}}"
+      }
+    }
+  ],
+  "status": "draft",
+  "activate_on_authorization": true
+}

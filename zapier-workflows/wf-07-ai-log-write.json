@@ -1,0 +1,61 @@
+{
+  "workflow_id": "WF-7",
+  "name": "AI Log Write",
+  "tier": "core",
+  "module": "ALL",
+  "description": "Every Nemotron inference call triggers a new record in the Airtable AI Log table with module tag, input brief, output text, model ID, and timestamp. This is the audit backbone for the entire orchestrator.",
+  "trigger": {
+    "app": "Webhooks by Zapier",
+    "event": "Catch Hook",
+    "config": {
+      "description": "Receives POST from Cloudflare Worker nemotron-router.js after every inference call",
+      "expected_payload": {
+        "module": "MODULE_A | MODULE_B | MODULE_C",
+        "model": "@cf/nvidia/nemotron-3-120b-a12b | claude-sonnet-4-20250514",
+        "input_brief": "string",
+        "output_text": "string",
+        "timestamp": "ISO 8601"
+      }
+    }
+  },
+  "actions": [
+    {
+      "step": 1,
+      "app": "Code by Zapier",
+      "action": "Run JavaScript",
+      "config": {
+        "description": "Estimate token count and flag anomalies",
+        "code": "const input = inputData.input_brief || ''; const output = inputData.output_text || ''; const estInputTokens = Math.ceil(input.length / 4); const estOutputTokens = Math.ceil(output.length / 4); const totalTokens = estInputTokens + estOutputTokens; const isFallback = inputData.model !== '@cf/nvidia/nemotron-3-120b-a12b'; output = { est_input_tokens: estInputTokens, est_output_tokens: estOutputTokens, est_total_tokens: totalTokens, is_fallback: isFallback, model_used: inputData.model };"
+      }
+    },
+    {
+      "step": 2,
+      "app": "Airtable",
+      "action": "Create Record",
+      "config": {
+        "base": "Master Orchestrator",
+        "table": "AI Log",
+        "fields": {
+          "Module": "{{trigger.module}}",
+          "Input Brief": "{{trigger.input_brief}}",
+          "Output Text": "{{trigger.output_text}}",
+          "Model ID": "{{trigger.model}}",
+          "Timestamp": "{{trigger.timestamp}}",
+          "Tokens Est": "{{step1.est_total_tokens}}"
+        }
+      }
+    },
+    {
+      "step": 3,
+      "app": "Slack",
+      "action": "Send Channel Message",
+      "config": {
+        "channel": "#ai-operations",
+        "message": "FALLBACK ALERT | Nemotron unavailable | Model used: {{step1.model_used}} | Module: {{trigger.module}} | Tokens: {{step1.est_total_tokens}}",
+        "condition": "{{step1.is_fallback}} = true"
+      }
+    }
+  ],
+  "status": "draft",
+  "activate_on_authorization": true
+}

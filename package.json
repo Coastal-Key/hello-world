@@ -1,0 +1,16 @@
+{
+  "name": "coastalkey-master-orchestrator",
+  "version": "2.0.0",
+  "description": "Coastal Key Treasure Coast Asset Management — Master Orchestrator AI Operations Platform",
+  "private": true,
+  "scripts": {
+    "deploy:router": "cd cloudflare-workers && wrangler deploy",
+    "deploy:linter": "cd cloudflare-workers/brand-voice-linter && wrangler deploy",
+    "deploy:pricing": "cd cloudflare-workers/pricing-drift-detector && wrangler deploy",
+    "deploy:zones": "cd cloudflare-workers/zone-validator && wrangler deploy",
+    "deploy:all": "npm run deploy:router && npm run deploy:linter && npm run deploy:pricing && npm run deploy:zones"
+  },
+  "keywords": ["coastal-key", "property-management", "ai-operations", "cloudflare-workers"],
+  "author": "David Hauer <david@coastalkey-pm.com>",
+  "license": "UNLICENSED"
+}

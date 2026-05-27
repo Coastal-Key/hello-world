@@ -1,0 +1,9 @@
+name = "coastalkey-zone-validator"
+main = "../zone-validator.js"
+compatibility_date = "2026-03-11"
+
+[vars]
+ENVIRONMENT = "production"
+
+# Secrets (set via `wrangler secret put`):
+# No secrets required — stateless validation worker

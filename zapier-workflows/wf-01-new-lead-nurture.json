@@ -1,0 +1,63 @@
+{
+  "workflow_id": "WF-1",
+  "name": "New Lead Nurture",
+  "tier": "core",
+  "module": "A",
+  "description": "When a new lead record is created in Airtable, triggers SCAA-1 Battle Plan assignment, Slack alert to #sales-team, and CEO welcome email via Gmail.",
+  "trigger": {
+    "app": "Airtable",
+    "event": "New Record",
+    "config": {
+      "base": "Master Orchestrator",
+      "table": "Leads"
+    }
+  },
+  "actions": [
+    {
+      "step": 1,
+      "app": "Code by Zapier",
+      "action": "Run JavaScript",
+      "config": {
+        "description": "Assign SCAA-1 Battle Plan based on segment and zone",
+        "code": "const segment = inputData.segment; const zone = inputData.zone; const propertyValue = parseFloat(inputData.property_value) || 0; let priority = 'Standard'; if (segment === 'Investor' && propertyValue >= 5000000) priority = 'Investor Track'; else if (segment === 'Luxury' || segment === 'Absentee') priority = 'Priority 1'; else if (segment === 'Seasonal') priority = 'Priority 2'; else if (segment === 'STR') priority = 'Priority 3'; output = { priority, segment, zone, property_value: propertyValue, battle_plan: 'SCAA-1', sequence_start: new Date().toISOString() };"
+      }
+    },
+    {
+      "step": 2,
+      "app": "Airtable",
+      "action": "Update Record",
+      "config": {
+        "base": "Master Orchestrator",
+        "table": "Leads",
+        "record_id": "{{trigger.record_id}}",
+        "fields": {
+          "Status": "Queued for Dial",
+          "Sequence Step": 1,
+          "Assigned Priority": "{{step1.priority}}"
+        }
+      }
+    },
+    {
+      "step": 3,
+      "app": "Slack",
+      "action": "Send Channel Message",
+      "config": {
+        "channel": "#sales-team",
+        "message": "NEW LEAD | {{trigger.name}} | {{step1.segment}} | {{step1.zone}} | ${{step1.property_value}} | Priority: {{step1.priority}} | Battle Plan: SCAA-1 assigned"
+      }
+    },
+    {
+      "step": 4,
+      "app": "Gmail",
+      "action": "Send Email",
+      "config": {
+        "from": "david@coastalkey-pm.com",
+        "to": "david@coastalkey-pm.com",
+        "subject": "New Lead: {{trigger.name}} | {{step1.zone}} | {{step1.priority}}",
+        "body": "New lead entered the pipeline.\n\nName: {{trigger.name}}\nSegment: {{step1.segment}}\nZone: {{step1.zone}}\nProperty Value: ${{step1.property_value}}\nPriority: {{step1.priority}}\n\nBattle Plan SCAA-1 assigned. Sequence begins immediately upon authorization.\n\nCoastal Key AI Operations"
+      }
+    }
+  ],
+  "status": "draft",
+  "activate_on_authorization": true
+}

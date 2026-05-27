@@ -1,0 +1,49 @@
+{
+  "workflow_id": "WF-4",
+  "name": "Buffer Published to Airtable",
+  "tier": "core",
+  "module": "B",
+  "description": "When Buffer confirms a post is published, updates the corresponding Airtable Content Calendar record Status to Published.",
+  "trigger": {
+    "app": "Buffer",
+    "event": "Post Published"
+  },
+  "actions": [
+    {
+      "step": 1,
+      "app": "Airtable",
+      "action": "Find Record",
+      "config": {
+        "base": "Master Orchestrator",
+        "table": "Content Calendar",
+        "formula": "AND({Buffer Post ID} = '{{trigger.post_id}}', {Status} = 'Scheduled')"
+      }
+    },
+    {
+      "step": 2,
+      "app": "Airtable",
+      "action": "Update Record",
+      "config": {
+        "base": "Master Orchestrator",
+        "table": "Content Calendar",
+        "record_id": "{{step1.record_id}}",
+        "fields": {
+          "Status": "Published",
+          "Published At": "{{trigger.published_at}}",
+          "Published URL": "{{trigger.post_url}}"
+        }
+      }
+    },
+    {
+      "step": 3,
+      "app": "Slack",
+      "action": "Send Channel Message",
+      "config": {
+        "channel": "#content-calendar",
+        "message": "PUBLISHED | {{trigger.platform}} | {{trigger.post_url}} | Airtable status updated"
+      }
+    }
+  ],
+  "status": "draft",
+  "activate_on_authorization": true
+}
