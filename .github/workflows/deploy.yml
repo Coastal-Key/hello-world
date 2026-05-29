@@ -96,6 +96,26 @@ jobs:
             echo "Attempt $i failed, retrying in 15s..." && sleep 15
           done
 
+  deploy-store:
+    name: Deploy Store
+    needs: test
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install wrangler
+        run: npm install -g wrangler@${{ env.WRANGLER_VERSION }}
+      - name: Deploy to Cloudflare Pages
+        run: |
+          wrangler pages project create ck-store --production-branch=main 2>&1 || true
+          for i in 1 2 3; do
+            wrangler pages deploy ck-store --project-name=ck-store --branch=main --commit-dirty=true && break
+            echo "Attempt $i failed, retrying in 15s..." && sleep 15
+          done
+
   deploy-gateway:
     name: Deploy API Gateway
     needs: test
@@ -173,7 +193,7 @@ jobs:
 
   smoke-test:
     name: Live Smoke Test and Status Record
-    needs: [deploy-gateway, deploy-website, deploy-command-center]
+    needs: [deploy-gateway, deploy-website, deploy-command-center, deploy-store]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     permissions:
