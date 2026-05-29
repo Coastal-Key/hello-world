@@ -11,7 +11,6 @@
   <meta property="og:description" content="AI-powered property management. Choose your service tier and enroll online.">
   <meta property="og:type" content="website">
   <meta property="og:url" content="https://store.coastalkey-pm.com/">
-  <script src="https://js.stripe.com/v3/"></script>
   <style>
     :root {
       --navy: #1B2A4A;
@@ -118,6 +117,7 @@
       text-decoration: none;
     }
     .btn-enroll:hover { background: #243656; }
+    .btn-enroll:disabled { opacity: 0.6; cursor: wait; }
     .tier-card.featured .btn-enroll { background: var(--ocean); }
     .tier-card.featured .btn-enroll:hover { background: #247a9d; }
 
@@ -135,6 +135,27 @@
     }
     .trust-item { font-size: 0.9375rem; color: var(--muted); }
     .trust-item strong { display: block; color: var(--navy); font-size: 1.75rem; margin-bottom: 4px; }
+
+    .addons {
+      padding: 60px 0;
+      background: #F8FAFC;
+    }
+    .addons h2 { text-align: center; font-size: 1.5rem; color: var(--navy); margin-bottom: 32px; }
+    .addon-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .addon-card {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px;
+    }
+    .addon-card .name { font-weight: 600; color: var(--navy); margin-bottom: 4px; }
+    .addon-card .price { color: var(--ocean); font-weight: 700; }
 
     .cta-section {
       background: var(--navy);
@@ -179,9 +200,9 @@
         "position": 1,
         "item": {
           "@type": "Service",
-          "name": "Home Watch Essential",
-          "description": "Bi-weekly inspections with 47-point checklist, photo reports, and sensor monitoring.",
-          "offers": { "@type": "Offer", "price": "149", "priceCurrency": "USD", "unitText": "MONTH" }
+          "name": "Select",
+          "description": "Standard home watch with weekly property visits, photo documentation, and digital reports.",
+          "offers": { "@type": "Offer", "price": "195", "priceCurrency": "USD", "unitText": "MONTH" }
         }
       },
       {
@@ -189,9 +210,9 @@
         "position": 2,
         "item": {
           "@type": "Service",
-          "name": "Home Watch Premium",
-          "description": "Weekly inspections with vendor coordination, storm protocol, and concierge service.",
-          "offers": { "@type": "Offer", "price": "249", "priceCurrency": "USD", "unitText": "MONTH" }
+          "name": "Premier",
+          "description": "Enhanced property management with concierge services, priority response, and insurer-grade compliance.",
+          "offers": { "@type": "Offer", "price": "295", "priceCurrency": "USD", "unitText": "MONTH" }
         }
       },
       {
@@ -199,9 +220,9 @@
         "position": 3,
         "item": {
           "@type": "Service",
-          "name": "Full Property Management",
-          "description": "Complete management with tenant placement, rent collection, and maintenance.",
-          "offers": { "@type": "Offer", "price": "399", "priceCurrency": "USD", "unitText": "MONTH" }
+          "name": "Platinum",
+          "description": "Full luxury property management with 24/7 coverage, personal concierge, and white-glove service.",
+          "offers": { "@type": "Offer", "price": "395", "priceCurrency": "USD", "unitText": "MONTH" }
         }
       }
     ]
@@ -234,47 +255,50 @@
     <div class="tier-grid">
 
       <div class="tier-card">
-        <div class="tier-name">Home Watch Essential</div>
-        <div class="tier-price">$149<span>/month</span></div>
-        <div class="tier-desc">Bi-weekly inspections for seasonal homeowners</div>
+        <div class="tier-name">Select</div>
+        <div class="tier-price">$195<span>/month</span></div>
+        <div class="tier-desc">Standard home watch with weekly visits</div>
         <ul class="tier-features">
-          <li>24 inspections per year (bi-weekly)</li>
-          <li>47-point property checklist</li>
-          <li>Photo documentation reports</li>
-          <li>IoT sensor monitoring</li>
-          <li>Emergency alert response</li>
+          <li>Weekly property inspections</li>
+          <li>Photo-backed digital reports</li>
+          <li>GPS-timestamped documentation</li>
+          <li>Email alerts for issues detected</li>
+          <li>Basic vendor coordination</li>
+          <li>AI-powered risk monitoring</li>
         </ul>
-        <button class="btn-enroll" data-tier="essential" data-price="149">Enroll Now</button>
+        <button class="btn-enroll" data-service="select">Enroll Now</button>
       </div>
 
       <div class="tier-card featured">
-        <div class="tier-name">Home Watch Premium</div>
-        <div class="tier-price">$249<span>/month</span></div>
-        <div class="tier-desc">Weekly inspections with full concierge</div>
+        <div class="tier-name">Premier</div>
+        <div class="tier-price">$295<span>/month</span></div>
+        <div class="tier-desc">Enhanced management with concierge</div>
         <ul class="tier-features">
-          <li>52 inspections per year (weekly)</li>
-          <li>Everything in Essential</li>
-          <li>Vendor coordination and dispatch</li>
-          <li>Hurricane and storm protocol</li>
-          <li>Concierge arrival preparation</li>
-          <li>Priority response (under 2 hours)</li>
+          <li>Everything in Select</li>
+          <li>Bi-weekly inspections</li>
+          <li>Concierge services coordination</li>
+          <li>Priority emergency response</li>
+          <li>Insurance-compliant reporting</li>
+          <li>Monthly financial summary</li>
+          <li>Predictive maintenance alerts</li>
         </ul>
-        <button class="btn-enroll" data-tier="premium" data-price="249">Enroll Now</button>
+        <button class="btn-enroll" data-service="premier">Enroll Now</button>
       </div>
 
       <div class="tier-card">
-        <div class="tier-name">Full Property Management</div>
-        <div class="tier-price">$399<span>/month</span></div>
-        <div class="tier-desc">Complete management for investors</div>
+        <div class="tier-name">Platinum</div>
+        <div class="tier-price">$395<span>/month</span></div>
+        <div class="tier-desc">Full luxury management, 24/7 coverage</div>
         <ul class="tier-features">
-          <li>Everything in Premium</li>
-          <li>Tenant placement and screening</li>
-          <li>Rent collection and disbursement</li>
-          <li>Maintenance coordination</li>
-          <li>Financial reporting dashboard</li>
-          <li>Lease management</li>
+          <li>Everything in Premier</li>
+          <li>24/7 monitoring and response</li>
+          <li>Personal concierge assigned</li>
+          <li>White-glove move-in/move-out</li>
+          <li>Hurricane preparation and recovery</li>
+          <li>Real-time AI dashboard access</li>
+          <li>Direct CEO communication line</li>
         </ul>
-        <button class="btn-enroll" data-tier="full" data-price="399">Enroll Now</button>
+        <button class="btn-enroll" data-service="platinum">Enroll Now</button>
       </div>
 
       <div class="tier-card">
@@ -292,6 +316,29 @@
         <a class="btn-enroll" href="https://coastalkey-pm.com/schedule/">Schedule Consultation</a>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<section class="addons">
+  <div class="container">
+    <h2>One-Time Services</h2>
+    <div class="addon-grid">
+      <div class="addon-card">
+        <div class="name">Hurricane Preparation</div>
+        <div class="price">$350</div>
+        <button class="btn-enroll" data-service="hurricanePrep" style="margin-top:12px;padding:10px;">Purchase</button>
+      </div>
+      <div class="addon-card">
+        <div class="name">Deep Inspection</div>
+        <div class="price">$150</div>
+        <button class="btn-enroll" data-service="deepInspection" style="margin-top:12px;padding:10px;">Purchase</button>
+      </div>
+      <div class="addon-card">
+        <div class="name">Onboarding Setup</div>
+        <div class="price">$250</div>
+        <button class="btn-enroll" data-service="onboarding" style="margin-top:12px;padding:10px;">Purchase</button>
+      </div>
     </div>
   </div>
 </section>
@@ -328,26 +375,35 @@
 </footer>
 
 <script>
-  document.querySelectorAll('.btn-enroll[data-tier]').forEach(btn => {
+  // Enrollment flow — calls the live CK API Gateway payment-link engine.
+  // Proxied via _redirects: /api/* -> ck-api-gateway.david-e59.workers.dev/v1/*
+  // Endpoint: POST /v1/payments/checkout  body { service, email }  -> { paymentLink }
+  document.querySelectorAll('.btn-enroll[data-service]').forEach(btn => {
     btn.addEventListener('click', async () => {
-      const tier = btn.dataset.tier;
-      const price = btn.dataset.price;
+      const service = btn.dataset.service;
+      const email = prompt('Enter your email to continue to secure checkout:');
+      if (email === null) return; // user cancelled
+      const original = btn.textContent;
       btn.textContent = 'Processing...';
       btn.disabled = true;
       try {
-        const res = await fetch('/api/payments/create-checkout', {
+        const res = await fetch('/api/payments/checkout', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ tier, price: parseInt(price), successUrl: window.location.origin + '/success', cancelUrl: window.location.href }),
+          body: JSON.stringify({ service, email: email || null }),
         });
         const data = await res.json();
-        if (data.url) {
-          window.location.href = data.url;
+        if (data.paymentLink) {
+          window.location.href = data.paymentLink;
         } else {
-          window.location.href = 'https://coastalkey-pm.com/schedule/?tier=' + tier;
+          // Fallback to consultation booking if Stripe link unavailable
+          window.location.href = 'https://coastalkey-pm.com/schedule/?service=' + service;
         }
       } catch {
-        window.location.href = 'https://coastalkey-pm.com/schedule/?tier=' + tier;
+        window.location.href = 'https://coastalkey-pm.com/schedule/?service=' + service;
+      } finally {
+        btn.textContent = original;
+        btn.disabled = false;
       }
     });
   });
