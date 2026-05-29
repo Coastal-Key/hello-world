@@ -266,8 +266,8 @@ import { handleAvatarDashboard, handleAvatarGenerate, handleAvatarStatus } from 
 import { handleITAMDashboard, handleITAMKpis, handleITAMCategory, handleITAMScore, handleITAMTco, handleITAMHealth, handleITAMStrategic } from './routes/itam-kpi.js';
 import { getFullManifest, getManifestSummary } from './agents/agent-manifest.js';
 import {
-  handleCampaignPeakTimeDashboard, handleCampaignSchedule, handleCampaignNextSlots,
-  handleCampaignMatrix, handleCampaignDST, handleCampaignBulletin, handleCampaignPublishStatus,
+  handleCampaignPeakTimeDashboard, handleCampaignSchedule as handleCampaignPeakTimeSchedule, handleCampaignNextSlots,
+  handleCampaignMatrix as handleCampaignPeakTimeMatrix, handleCampaignDST, handleCampaignBulletin, handleCampaignPublishStatus,
   handleCampaignSchedulePost, handleCampaignScheduleBatch,
   handleCampaignSMO, handleCampaignSMOAnalyze,
   handleCampaignMarketAnalysis, handleCampaignProblems, handleCampaignOffers,
@@ -283,7 +283,7 @@ import { handleListForecastAgents, handleGetForecastAgent, handleForecastDashboa
 import { handlePeakTimeDashboard, handlePeakTimeOptimal, handlePeakTimeWindows, handlePeakTimeBlackouts } from './routes/peak-time.js';
 import { handleGrowthDashboard, handleGrowthCertifications, handleGrowthRecruitment, handleGrowthReferrals } from './routes/growth-platform.js';
 import { handleListSocialAgents, handleGetSocialAgent, handleSocialDashboard, handleSocialGenerate, handleSocialCampaign, handleSocialCalendar } from './routes/social-campaign.js';
-import { handleGenerateReport, handleGenerateSummary, handleSentinelWorkforceStatus } from './routes/sentinel-report.js';
+import { handleGenerateReport as handleGenerateSentinelReport, handleGenerateSummary, handleSentinelWorkforceStatus } from './routes/sentinel-report.js';
 import { handleAgencyDashboard, handleListUnits, handleGetUnit, handleUnitReview, handleBoardMemo, handleUnitSOP, handleOnboardUnit } from './routes/ai-workforce.js';
 import { handleProductCatalog, handlePaidProducts, handleLeadMagnets, handleProductDetail, handleProductCheckout, handlePurchaseLookup } from './routes/digital-products.js';
 import { handleStripeWebhook } from './routes/stripe-webhook.js';
@@ -392,6 +392,11 @@ export default {
     }
     if (path === '/v1/payments/pricing' && method === 'GET') {
       return handlePublicPricing();
+    }
+    if (path === '/v1/payments/checkout' && method === 'POST') {
+      // Public storefront checkout — creates a Stripe-hosted checkout session.
+      // No charge occurs until the customer completes payment on Stripe.
+      return await handleCreatePaymentLink(request, env, ctx);
     }
     if (path === '/v1/payments/webhook' && method === 'POST') {
       return await handleStripeWebhook(request, env, ctx);
@@ -961,7 +966,7 @@ export default {
 
       // ── Sentinel Standard Report Generator (AI Workforce Unit #1) ──
       if (path === '/v1/sentinel/generate-report' && method === 'POST') {
-        return await handleGenerateReport(request, env, ctx);
+        return await handleGenerateSentinelReport(request, env, ctx);
       }
       if (path === '/v1/sentinel/generate-summary' && method === 'POST') {
         return await handleGenerateSummary(request, env, ctx);
@@ -1389,13 +1394,13 @@ export default {
         return handleCampaignPeakTimeDashboard();
       }
       if (path === '/v1/campaign/peak-time/schedule' && method === 'GET') {
-        return handleCampaignSchedule(url);
+        return handleCampaignPeakTimeSchedule(url);
       }
       if (path === '/v1/campaign/peak-time/next-slots' && method === 'GET') {
         return handleCampaignNextSlots();
       }
       if (path === '/v1/campaign/peak-time/matrix' && method === 'GET') {
-        return handleCampaignMatrix();
+        return handleCampaignPeakTimeMatrix();
       }
       if (path === '/v1/campaign/peak-time/dst' && method === 'GET') {
         return handleCampaignDST(url);
