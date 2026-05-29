@@ -115,6 +115,35 @@ jobs:
             wrangler pages deploy ck-store --project-name=ck-store --branch=main --commit-dirty=true && break
             echo "Attempt $i failed, retrying in 15s..." && sleep 15
           done
+      - name: Provision store.coastalkey-pm.com custom domain + DNS (SIG-04)
+        run: |
+          set +e
+          API="https://api.cloudflare.com/client/v4"
+          AUTH="Authorization: Bearer ${CLOUDFLARE_API_TOKEN}"
+          DOMAIN="store.coastalkey-pm.com"
+          ZONE="coastalkey-pm.com"
+
+          # 1. Attach the custom domain to the ck-store Pages project (idempotent)
+          curl -sS -X POST "$API/accounts/${CLOUDFLARE_ACCOUNT_ID}/pages/projects/ck-store/domains" \
+            -H "$AUTH" -H "Content-Type: application/json" \
+            -d "{\"name\":\"$DOMAIN\"}" | head -c 600; echo
+
+          # 2. Resolve the zone id for coastalkey-pm.com
+          ZONE_ID=$(curl -sS "$API/zones?name=${ZONE}&status=active" -H "$AUTH" \
+            | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const j=JSON.parse(d);console.log(j.result&&j.result[0]?j.result[0].id:'')}catch{console.log('')}})")
+          if [ -z "$ZONE_ID" ]; then echo "Zone $ZONE not found on this account — DNS step skipped (custom domain still attached)."; exit 0; fi
+          echo "Zone id: $ZONE_ID"
+
+          # 3. Create the proxied CNAME store -> ck-store.pages.dev (skip if it already exists)
+          EXISTS=$(curl -sS "$API/zones/$ZONE_ID/dns_records?type=CNAME&name=${DOMAIN}" -H "$AUTH" \
+            | node -e "let d='';process.stdin.on('data',c=>d+=c).on('end',()=>{try{const j=JSON.parse(d);console.log(j.result&&j.result.length?'yes':'no')}catch{console.log('no')}})")
+          if [ "$EXISTS" = "yes" ]; then
+            echo "CNAME $DOMAIN already exists — nothing to do."
+          else
+            curl -sS -X POST "$API/zones/$ZONE_ID/dns_records" \
+              -H "$AUTH" -H "Content-Type: application/json" \
+              -d "{\"type\":\"CNAME\",\"name\":\"store\",\"content\":\"ck-store.pages.dev\",\"proxied\":true,\"comment\":\"Coastal Key Store — SIG-04\"}" | head -c 600; echo
+          fi
 
   deploy-gateway:
     name: Deploy API Gateway
