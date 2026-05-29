@@ -20,14 +20,13 @@
       "comment": "Coastal Key Store — Cloudflare Pages custom domain"
     }
   ],
+  "provisioning": "Automated via .github/workflows/deploy.yml (deploy-store job). On every push to main, CI attaches the custom domain to the ck-store Pages project and creates the proxied CNAME store -> ck-store.pages.dev using CLOUDFLARE_API_TOKEN. Idempotent — safe to re-run.",
   "verification": {
     "steps": [
-      "1. Go to dash.cloudflare.com > Pages > ck-store > Custom domains",
-      "2. Click 'Set up a custom domain'",
-      "3. Enter: store.coastalkey-pm.com",
-      "4. Cloudflare auto-creates the CNAME if the zone is on Cloudflare",
-      "5. Wait for SSL certificate provisioning (usually < 5 minutes)",
-      "6. Verify https://store.coastalkey-pm.com loads the enrollment page"
+      "1. Push to main triggers the deploy-store CI job which provisions the domain + DNS automatically",
+      "2. Wait for SSL certificate provisioning (usually < 5 minutes after first attach)",
+      "3. Verify https://store.coastalkey-pm.com loads the enrollment page",
+      "4. Manual fallback: dash.cloudflare.com > Pages > ck-store > Custom domains > add store.coastalkey-pm.com"
     ]
   }
 }
