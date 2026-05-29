@@ -1,0 +1,3 @@
+# Coastal Key Store — Redirects
+/api/*  https://ck-api-gateway.david-e59.workers.dev/v1/:splat  200
+/*      /index.html  200

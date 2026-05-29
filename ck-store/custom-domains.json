@@ -1,0 +1,33 @@
+{
+  "project": "ck-store",
+  "pagesUrl": "ck-store.pages.dev",
+  "customDomains": [
+    {
+      "domain": "store.coastalkey-pm.com",
+      "type": "CNAME",
+      "target": "ck-store.pages.dev",
+      "proxied": true,
+      "ssl": "full",
+      "status": "pending"
+    }
+  ],
+  "dnsRecords": [
+    {
+      "type": "CNAME",
+      "name": "store",
+      "content": "ck-store.pages.dev",
+      "proxied": true,
+      "comment": "Coastal Key Store — Cloudflare Pages custom domain"
+    }
+  ],
+  "verification": {
+    "steps": [
+      "1. Go to dash.cloudflare.com > Pages > ck-store > Custom domains",
+      "2. Click 'Set up a custom domain'",
+      "3. Enter: store.coastalkey-pm.com",
+      "4. Cloudflare auto-creates the CNAME if the zone is on Cloudflare",
+      "5. Wait for SSL certificate provisioning (usually < 5 minutes)",
+      "6. Verify https://store.coastalkey-pm.com loads the enrollment page"
+    ]
+  }
+}
