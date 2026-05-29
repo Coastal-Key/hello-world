@@ -393,6 +393,11 @@ export default {
     if (path === '/v1/payments/pricing' && method === 'GET') {
       return handlePublicPricing();
     }
+    if (path === '/v1/payments/checkout' && method === 'POST') {
+      // Public storefront checkout — creates a Stripe-hosted checkout session.
+      // No charge occurs until the customer completes payment on Stripe.
+      return await handleCreatePaymentLink(request, env, ctx);
+    }
     if (path === '/v1/payments/webhook' && method === 'POST') {
       return await handleStripeWebhook(request, env, ctx);
     }
